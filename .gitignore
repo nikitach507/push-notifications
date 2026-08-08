@@ -48,3 +48,6 @@ env/
 # uv
 .uv/
 uv.lock
+
+# md
+*.md

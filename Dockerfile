@@ -8,12 +8,12 @@ WORKDIR /app
 RUN pip install --no-cache-dir uv
 
 # Copy project files
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 COPY src ./src
 COPY main.py ./
 
 # Install dependencies
-RUN uv sync --frozen
+RUN uv sync --no-cache
 
 # Run the bot
 CMD ["uv", "run", "python", "main.py"]
