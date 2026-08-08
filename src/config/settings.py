@@ -29,6 +29,12 @@ class Settings(BaseSettings):
         description="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
     )
 
+    # Web Server Configuration (for Render.com free tier)
+    port: int = Field(
+        default=8080,
+        description="Port for web server (used for health checks on Render)",
+    )
+
 
 # Singleton instance
 settings = Settings()

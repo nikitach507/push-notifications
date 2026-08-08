@@ -4,6 +4,7 @@ import asyncio
 import logging
 import sys
 
+from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -60,6 +61,32 @@ async def on_shutdown(scheduler: ReminderScheduler) -> None:
     logger.info("Bot stopped successfully!")
 
 
+async def health_check(request: web.Request) -> web.Response:
+    """Health check endpoint for Render.com and other platforms.
+
+    Args:
+        request: HTTP request
+
+    Returns:
+        web.Response: JSON response with status
+    """
+    return web.json_response({"status": "ok", "service": "telegram-reminder-bot"})
+
+
+async def start_web_server() -> None:
+    """Start web server for health checks (required for Render.com free tier)."""
+    app = web.Application()
+    app.router.add_get("/", health_check)
+    app.router.add_get("/health", health_check)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", settings.port)
+    await site.start()
+
+    logger.info(f"Web server started on port {settings.port}")
+
+
 async def main() -> None:
     """Main function to run the bot."""
     # Initialize bot and dispatcher
@@ -80,10 +107,14 @@ async def main() -> None:
     dp.startup.register(lambda: on_startup(bot, scheduler))
     dp.shutdown.register(lambda: on_shutdown(scheduler))
 
+    # Create tasks for bot and web server
+    bot_task = asyncio.create_task(dp.start_polling(bot))
+    web_task = asyncio.create_task(start_web_server())
+
     try:
-        # Start bot
-        logger.info("Starting bot polling...")
-        await dp.start_polling(bot)
+        # Start both bot and web server
+        logger.info("Starting bot polling and web server...")
+        await asyncio.gather(bot_task, web_task)
     except Exception as e:
         logger.error(f"Error running bot: {e}", exc_info=True)
     finally:
