@@ -1,0 +1,13 @@
+services:
+  - type: worker
+    name: telegram-reminder-bot
+    env: python
+    buildCommand: "pip install uv && uv sync"
+    startCommand: "uv run python main.py"
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO

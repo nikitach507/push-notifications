@@ -1,0 +1,21 @@
+[project]
+name = "push-notification"
+version = "0.1.0"
+description = "Telegram bot for event reminders and notifications"
+authors = [
+    { name = "nikitach507", email = "chuprinnikita8@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "aiogram>=3.15.0",
+    "sqlalchemy>=2.0.36",
+    "aiosqlite>=0.20.0",
+    "asyncpg>=0.30.0",
+    "apscheduler>=3.10.4",
+    "pydantic-settings>=2.6.1",
+    "python-dotenv>=1.0.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
