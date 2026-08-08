@@ -31,8 +31,9 @@ class Settings(BaseSettings):
 
     # Web Server Configuration (for Render.com free tier)
     port: int = Field(
-        default=8080,
+        default=10000,
         description="Port for web server (used for health checks on Render)",
+        validation_alias="PORT",  # Render sets PORT env variable
     )
 
 
