@@ -3,15 +3,17 @@
 import asyncio
 import logging
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import select
 
+from src.bot.keyboards import get_reminder_action_keyboard
 from src.database.database import db_manager
 from src.database.models import Event, Reminder, User
-from src.utils.helpers import format_datetime
+from src.utils.helpers import format_datetime, format_time_remaining
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +32,7 @@ class ReminderScheduler:
 
     async def check_and_send_reminders(self) -> None:
         """Check for pending reminders and send them."""
-        now = datetime.now()
+        now = datetime.now(ZoneInfo("Europe/Prague"))
 
         async with db_manager.get_session() as session:
             # Get all pending reminders that should be sent
@@ -65,11 +67,14 @@ class ReminderScheduler:
                         logger.warning(f"User not found for event {event.id}")
                         continue
 
-                    # Send reminder message
+                    # Send reminder message with new format
+                    time_remaining = format_time_remaining(event.event_date)
+
                     message_text = (
                         f"🔔 <b>Напоминание!</b>\n\n"
                         f"📝 <b>{event.title}</b>\n"
-                        f"📅 {format_datetime(event.event_date)}\n"
+                        f"📅 Время окончания: {format_datetime(event.event_date)}\n"
+                        f"⏰ {time_remaining}\n"
                     )
 
                     if event.description:
@@ -79,6 +84,7 @@ class ReminderScheduler:
                         chat_id=user.telegram_id,
                         text=message_text,
                         parse_mode="HTML",
+                        reply_markup=get_reminder_action_keyboard(event.id),
                     )
 
                     # Mark reminder as sent

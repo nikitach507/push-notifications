@@ -103,9 +103,8 @@ async def main() -> None:
     dp.include_router(common.router)
     dp.include_router(events.router)
 
-    # Setup startup and shutdown hooks
-    dp.startup.register(lambda: on_startup(bot, scheduler))
-    dp.shutdown.register(lambda: on_shutdown(scheduler))
+    # Execute startup actions
+    await on_startup(bot, scheduler)
 
     # Create tasks for bot and web server
     bot_task = asyncio.create_task(dp.start_polling(bot))
@@ -118,6 +117,8 @@ async def main() -> None:
     except Exception as e:
         logger.error(f"Error running bot: {e}", exc_info=True)
     finally:
+        # Execute shutdown actions
+        await on_shutdown(scheduler)
         await bot.session.close()
 
 

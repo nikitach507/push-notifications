@@ -21,43 +21,32 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
 
 
 def get_reminder_periods_keyboard() -> InlineKeyboardMarkup:
-    """Get reminder periods selection keyboard.
+    """Get reminder periods selection keyboard (3x3 grid).
 
     Returns:
         InlineKeyboardMarkup: Reminder periods keyboard
     """
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
+            # Первая строка: 30д, 14д, 7д
             [
-                InlineKeyboardButton(
-                    text="🔔 За 1 неделю", callback_data="reminder:week:1"
-                ),
+                InlineKeyboardButton(text="30д", callback_data="reminder:days:30"),
+                InlineKeyboardButton(text="14д", callback_data="reminder:days:14"),
+                InlineKeyboardButton(text="7д", callback_data="reminder:days:7"),
             ],
+            # Вторая строка: 5д, 2д, 1д
             [
-                InlineKeyboardButton(
-                    text="🔔 За 3 дня", callback_data="reminder:days:3"
-                ),
+                InlineKeyboardButton(text="5д", callback_data="reminder:days:5"),
+                InlineKeyboardButton(text="2д", callback_data="reminder:days:2"),
+                InlineKeyboardButton(text="1д", callback_data="reminder:days:1"),
             ],
+            # Третья строка: 12ч, 3ч, 1ч
             [
-                InlineKeyboardButton(
-                    text="🔔 За 2 дня", callback_data="reminder:days:2"
-                ),
+                InlineKeyboardButton(text="12ч", callback_data="reminder:hours:12"),
+                InlineKeyboardButton(text="3ч", callback_data="reminder:hours:3"),
+                InlineKeyboardButton(text="1ч", callback_data="reminder:hours:1"),
             ],
-            [
-                InlineKeyboardButton(
-                    text="🔔 За 1 день", callback_data="reminder:days:1"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔔 За 12 часов", callback_data="reminder:hours:12"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔔 За 2 часа", callback_data="reminder:hours:2"
-                ),
-            ],
+            # Кнопка завершения
             [
                 InlineKeyboardButton(
                     text="✅ Завершить выбор", callback_data="reminder:done"
@@ -131,6 +120,71 @@ def get_cancel_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="❌ Отмена", callback_data="cancel"),
+            ],
+        ]
+    )
+    return keyboard
+
+
+def get_reminder_action_keyboard(event_id: int) -> InlineKeyboardMarkup:
+    """Get reminder action keyboard with Done and Acknowledge buttons.
+
+    Args:
+        event_id: Event ID
+
+    Returns:
+        InlineKeyboardMarkup: Reminder action keyboard
+    """
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Выполнено", callback_data=f"reminder_action:done:{event_id}"
+                ),
+                InlineKeyboardButton(
+                    text="👌 Ack", callback_data=f"reminder_action:ack:{event_id}"
+                ),
+            ],
+        ]
+    )
+    return keyboard
+
+
+def get_edit_field_keyboard(event_id: int) -> InlineKeyboardMarkup:
+    """Get edit field selection keyboard.
+
+    Args:
+        event_id: Event ID
+
+    Returns:
+        InlineKeyboardMarkup: Edit field selection keyboard
+    """
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📝 Название", callback_data=f"edit:title:{event_id}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📄 Описание", callback_data=f"edit:description:{event_id}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📅 Дата", callback_data=f"edit:date:{event_id}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔔 Напоминания", callback_data=f"edit:reminders:{event_id}"
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="❌ Отмена", callback_data=f"edit:cancel:{event_id}"
+                ),
             ],
         ]
     )
