@@ -19,10 +19,21 @@ class DatabaseManager:
         Args:
             database_url: Database connection URL
         """
+        # Add SSL parameters for PostgreSQL connections (required for Supabase and cloud providers)
+        connect_args = {}
+        if database_url.startswith("postgresql"):
+            connect_args = {
+                "ssl": "require",  # Require SSL connection
+                "server_settings": {
+                    "application_name": "telegram_reminder_bot"
+                }
+            }
+
         self.engine: AsyncEngine = create_async_engine(
             database_url,
             echo=False,
             future=True,
+            connect_args=connect_args,
         )
         self.async_session_maker = sessionmaker(
             self.engine,
